@@ -1,0 +1,15 @@
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+
+backups/
+*.sql.gz
+*.dump
+
+.env
+.env.local
+.DS_Store
