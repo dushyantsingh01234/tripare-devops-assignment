@@ -1,3 +1,5 @@
-terraform {
-  backend "s3" {}
-}
+# see infra/envs/dev/backend.tf - same story, just prod bucket + key.
+#
+# terraform {
+#   backend "s3" {}
+# }

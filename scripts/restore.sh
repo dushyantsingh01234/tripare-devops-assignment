@@ -1,18 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Usage: ./scripts/restore.sh <backup_file.sql.gz> [target_db]
+# Usage: ./scripts/restore.sh [backup_file.sql.gz] [target_db]
+# With no args, picks the newest dump under ./backups/.
 # Drops the target DB, recreates it empty, and streams the dump back in.
 
-if [[ $# -lt 1 ]]; then
-    echo "usage: $0 <backup_file.sql.gz> [target_db]" >&2
-    exit 2
-fi
-
-BACKUP_FILE="$1"
-TARGET_DB="${2:-${POSTGRES_DB:-booking}_restore}"
+BACKUP_DIR="${BACKUP_DIR:-./backups}"
 CONTAINER="${DB_CONTAINER:-booking-db}"
 PGUSER_="${POSTGRES_USER:-app}"
+
+if [[ $# -ge 1 && -n "$1" ]]; then
+    BACKUP_FILE="$1"
+else
+    BACKUP_FILE="$(ls -1t "$BACKUP_DIR"/*.sql.gz 2>/dev/null | head -1 || true)"
+    if [[ -z "$BACKUP_FILE" ]]; then
+        echo "no backups found in $BACKUP_DIR - run ./scripts/backup.sh first" >&2
+        exit 1
+    fi
+    echo "no file given, using newest: $BACKUP_FILE"
+fi
+
+TARGET_DB="${2:-${POSTGRES_DB:-booking}_restore}"
 
 if [[ ! -f "$BACKUP_FILE" ]]; then
     echo "backup file not found: $BACKUP_FILE" >&2

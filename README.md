@@ -16,6 +16,31 @@ scripts/{backup,restore}.sh
 .github/workflows/terraform.yml     # fmt/init/validate/plan on PRs
 ```
 
+## quick review
+
+Terraform (either env):
+
+```
+cd infra/envs/dev
+terraform fmt -check -recursive .
+terraform init -backend=false
+terraform validate
+terraform plan -refresh=false
+```
+
+`-backend=false` skips the S3 backend so you don't need AWS creds. `terraform.tfvars`
+is auto-loaded from the env dir.
+
+Local DB:
+
+```
+docker compose up -d
+./scripts/backup.sh          # writes ./backups/<db>_<ts>.sql.gz
+./scripts/restore.sh         # no args -> uses the newest backup
+```
+
+More detail in the sections below.
+
 ## terraform
 
 Needs terraform >= 1.6. AWS apply is not required for the grader - fmt/init/

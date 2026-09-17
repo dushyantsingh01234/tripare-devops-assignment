@@ -39,13 +39,11 @@ jobs:
         with:
           terraform_version: 1.9.5
 
-      # PRs don't have S3 creds - drop the backend block so init/plan can run
-      # without touching a real backend. Real applies happen from a protected
-      # job that reconfigures with backend.hcl.
-      - name: init (no backend)
-        run: |
-          rm -f backend.tf
-          terraform init -backend=false -input=false
+      # backend block is commented out in backend.tf by default; local state is
+      # fine for review. real applies happen from a protected job that inits
+      # with -backend-config=backend.hcl.
+      - name: init
+        run: terraform init -input=false
 
       - name: validate
         run: terraform validate -no-color
