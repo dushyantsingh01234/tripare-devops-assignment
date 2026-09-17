@@ -12,13 +12,13 @@ resource "aws_security_group" "db" {
 }
 
 resource "aws_security_group_rule" "db_ingress_from_ecs" {
-  for_each                 = toset(var.allowed_security_group_ids)
+  count                    = length(var.allowed_security_group_ids)
   type                     = "ingress"
   from_port                = var.port
   to_port                  = var.port
   protocol                 = "tcp"
   security_group_id        = aws_security_group.db.id
-  source_security_group_id = each.value
+  source_security_group_id = var.allowed_security_group_ids[count.index]
   description              = "DB port from allowed SG"
 }
 
