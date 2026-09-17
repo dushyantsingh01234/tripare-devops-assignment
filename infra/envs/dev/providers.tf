@@ -16,6 +16,12 @@ terraform {
 provider "aws" {
   region = var.region
 
+  # skip the sts-based checks so `terraform plan` can run in CI with mock creds.
+  # real apply still needs valid IAM - these flags only affect provider init.
+  skip_credentials_validation = true
+  skip_metadata_api_check     = true
+  skip_requesting_account_id  = true
+
   default_tags {
     tags = {
       Project     = "tripare-booking"
